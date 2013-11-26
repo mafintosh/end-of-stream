@@ -1,0 +1,12 @@
+{
+  "name": "end-of-stream",
+  "version": "0.1.0",
+  "description": "wait for a readable/writable to finish or fail",
+  "repository": "git://github.com/mafintosh/end-of-stream.git",
+  "dependencies": {
+    "once": "~1.3.0"
+  },
+  "scripts": {
+  	"test": "node test.js"
+  }
+}
