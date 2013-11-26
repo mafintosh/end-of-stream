@@ -1,6 +1,6 @@
 # end-of-stream
 
-A node module that calls a callback when a readable/writable/duplex stream has completed.
+A node module that calls a callback when a readable/writable/duplex stream has completed or failed.
 
 	npm install end-of-stream
 
