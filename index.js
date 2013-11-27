@@ -2,12 +2,8 @@ var once = require('once');
 
 var noop = function() {};
 
-var patch = function(stream, fn) { // ensure a 'finish' event - even for 0.8 streams
-	var end = stream.end;
-	stream.end = function() {
-		fn();
-		end.apply(this, arguments);
-	};
+var isRequest = function(stream) {
+	return stream.setHeader && typeof stream.abort === 'function';
 };
 
 var eos = function(stream, opts, callback) {
@@ -20,6 +16,10 @@ var eos = function(stream, opts, callback) {
 	var rs = stream._readableState;
 	var readable = opts.readable || (opts.readable !== false && stream.readable);
 	var writable = opts.writable || (opts.writable !== false && stream.writable);
+
+	var onlegacyfinish = function() {
+		if (!stream.writable) onfinish();
+	};
 
 	var onfinish = function() {
 		writable = false;
@@ -36,7 +36,13 @@ var eos = function(stream, opts, callback) {
 		if (writable && !(ws && ws.ended)) return callback(new Error('premature close'));
 	};
 
-	if (writable && !ws) patch(stream, onfinish);
+	if (isRequest(stream)) {
+		stream.on('complete', onfinish);
+		stream.on('abort', onclose);
+	} else if (writable && !ws) { // legacy streams
+		stream.on('end', onlegacyfinish);
+		stream.on('close', onlegacyfinish);
+	}
 
 	stream.on('end', onend);
 	stream.on('finish', onfinish);
