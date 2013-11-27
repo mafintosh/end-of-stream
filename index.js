@@ -49,8 +49,6 @@ var eos = function(stream, opts, callback) {
 	stream.on('error', callback);
 	stream.on('close', onclose);
 
-	stream.on('abort', onclose); // not really a stream event but needed for request compat...
-
 	return stream;
 };
 
