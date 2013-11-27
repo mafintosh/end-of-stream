@@ -1,6 +1,6 @@
 {
   "name": "end-of-stream",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Call a callback when a readable/writable/duplex stream has completed or failed.",
   "repository": "git://github.com/mafintosh/end-of-stream.git",
   "dependencies": {
