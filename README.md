@@ -36,6 +36,10 @@ eos(duplexStream, {writable:false}, function(err) {
 	if (err) return console.log('stream had an error or closed early');
 	console.log('stream has ended but might still be readable');
 });
+
+eos(readableStream, {error:false}, function(err) {
+	// do not treat emit('error', err) as a end-of-stream
+});
 ```
 
 ## License
