@@ -46,7 +46,7 @@ var eos = function(stream, opts, callback) {
 
 	stream.on('end', onend);
 	stream.on('finish', onfinish);
-	stream.on('error', callback);
+	if (opts.error !== false) stream.on('error', callback);
 	stream.on('close', onclose);
 
 	return stream;
