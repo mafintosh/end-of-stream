@@ -36,9 +36,15 @@ var eos = function(stream, opts, callback) {
 		if (writable && !(ws && ws.ended)) return callback(new Error('premature close'));
 	};
 
+	var onrequest = function() {
+		stream.req.on('finish', onfinish);
+	};
+
 	if (isRequest(stream)) {
 		stream.on('complete', onfinish);
 		stream.on('abort', onclose);
+		if (stream.req) onrequest();
+		else stream.on('request', onrequest);
 	} else if (writable && !ws) { // legacy streams
 		stream.on('end', onlegacyfinish);
 		stream.on('close', onlegacyfinish);
