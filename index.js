@@ -31,6 +31,11 @@ var eos = function(stream, opts, callback) {
 		if (!writable) callback();
 	};
 
+	var onexit = function(exitCode) {
+		if (exitCode) return callback(new Error('exited with error code: ' + exitCode));
+		return callback();
+	}
+
 	var onclose = function() {
 		if (readable && !(rs && rs.ended)) return callback(new Error('premature close'));
 		if (writable && !(ws && ws.ended)) return callback(new Error('premature close'));
@@ -51,6 +56,7 @@ var eos = function(stream, opts, callback) {
 	}
 
 	stream.on('end', onend);
+	stream.on('exit', onexit);
 	stream.on('finish', onfinish);
 	if (opts.error !== false) stream.on('error', callback);
 	stream.on('close', onclose);
@@ -63,6 +69,7 @@ var eos = function(stream, opts, callback) {
 		stream.removeListener('end', onlegacyfinish);
 		stream.removeListener('close', onlegacyfinish);
 		stream.removeListener('finish', onfinish);
+		stream.removeListener('exit', onexit);
 		stream.removeListener('end', onend);
 		stream.removeListener('error', callback);
 		stream.removeListener('close', onclose);
