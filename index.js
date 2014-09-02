@@ -32,9 +32,10 @@ var eos = function(stream, opts, callback) {
 	};
 
 	var onexit = function(exitCode) {
+		if (!(Array.isArray(stream.stdio) && stream.stdio.length === 3)) return;
 		if (exitCode) return callback(new Error('exited with error code: ' + exitCode));
-		return callback();
-	}
+		callback();
+	};
 
 	var onclose = function() {
 		if (readable && !(rs && rs.ended)) return callback(new Error('premature close'));
