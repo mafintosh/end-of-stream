@@ -6,6 +6,10 @@ var isRequest = function(stream) {
 	return stream.setHeader && typeof stream.abort === 'function';
 };
 
+var isChildProcess = function(stream) {
+	return stream.stdio && Array.isArray(stream.stdio) && stream.stdio.length === 3
+};
+
 var eos = function(stream, opts, callback) {
 	if (typeof opts === 'function') return eos(stream, null, opts);
 	if (!opts) opts = {};
@@ -32,9 +36,7 @@ var eos = function(stream, opts, callback) {
 	};
 
 	var onexit = function(exitCode) {
-		if (!(Array.isArray(stream.stdio) && stream.stdio.length === 3)) return;
-		if (exitCode) return callback(new Error('exited with error code: ' + exitCode));
-		callback();
+		callback(exitCode ? new Error('exited with error code: ' + exitCode) : null);
 	};
 
 	var onclose = function() {
@@ -56,8 +58,9 @@ var eos = function(stream, opts, callback) {
 		stream.on('close', onlegacyfinish);
 	}
 
+	if (isChildProcess(stream)) stream.on('exit', onexit);
+
 	stream.on('end', onend);
-	stream.on('exit', onexit);
 	stream.on('finish', onfinish);
 	if (opts.error !== false) stream.on('error', callback);
 	stream.on('close', onclose);
