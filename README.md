@@ -45,3 +45,7 @@ eos(readableStream, {error:false}, function(err) {
 ## License
 
 MIT
+
+## Related
+
+`end-of-stream` is part of the [mississippi stream utility collection](https://github.com/maxogden/mississippi) which includes more useful stream modules similar to this one.
