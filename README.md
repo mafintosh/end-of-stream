@@ -29,7 +29,7 @@ eos(duplexStream, function(err) {
 
 eos(duplexStream, {readable:false}, function(err) {
 	if (err) return console.log('stream had an error or closed early');
-	console.log('stream has ended but might still be readable');
+	console.log('stream has finished but might still be readable');
 });
 
 eos(duplexStream, {writable:false}, function(err) {
