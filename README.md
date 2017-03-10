@@ -7,24 +7,25 @@ A node module that calls a callback when a readable/writable/duplex stream has c
 ## Usage
 
 Simply pass a stream and a callback to the `eos`.
-Both legacy streams and streams2 are supported.
+Both legacy streams, streams2 and stream3 are supported.
 
 ``` js
 var eos = require('end-of-stream');
 
 eos(readableStream, function(err) {
+  // this will be set to the stream instance
 	if (err) return console.log('stream had an error or closed early');
-	console.log('stream has ended');
+	console.log('stream has ended', this === readableStream);
 });
 
 eos(writableStream, function(err) {
 	if (err) return console.log('stream had an error or closed early');
-	console.log('stream has finished');
+	console.log('stream has finished', this === writableStream);
 });
 
 eos(duplexStream, function(err) {
 	if (err) return console.log('stream had an error or closed early');
-	console.log('stream has ended and finished');
+	console.log('stream has ended and finished', this === duplexStream);
 });
 
 eos(duplexStream, {readable:false}, function(err) {
