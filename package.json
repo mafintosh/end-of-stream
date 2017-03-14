@@ -12,6 +12,9 @@
   "scripts": {
     "test": "node test.js"
   },
+  "files": [
+    "index.js"
+  ],
   "keywords": [
     "stream",
     "streams",
