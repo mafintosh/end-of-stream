@@ -1,7 +1,3 @@
-var once = require('once');
-
-var noop = function() {};
-
 var isRequest = function(stream) {
 	return stream.setHeader && typeof stream.abort === 'function';
 };
