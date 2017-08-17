@@ -1,7 +1,7 @@
 var assert = require('assert');
 var eos = require('./index');
 
-var expected = 8;
+var expected = 9;
 var fs = require('fs');
 var cp = require('child_process');
 var net = require('net');
@@ -80,7 +80,23 @@ var server = net.createServer(function(socket) {
 	});
 });
 
-setTimeout(function() {
+var EE = require('events').EventEmitter;
+var customStream = new EE();
+customStream.readable = true;
+eos(customStream, function(er) {
+	if (er) {
+		throw er;
+	}
+	expected--;
+	if (!expected) process.exit(0);
+});
+customStream.emit('close');
+customStream.emit('end');
+
+var timeout = setTimeout(function() {
 	assert(expected === 0);
 	process.exit(0);
 }, 1000);
+
+// don't keep the process open unnecessarily
+if (typeof timeout.unref === 'function') timeout.unref();
