@@ -83,7 +83,23 @@ var server = net.createServer(function(socket) {
 	});
 });
 
+// Succeeds
 var rs4 =	fs.createReadStream('/dev/random');
+var p1 = pumpify(
+	through(),
+	through(function(chunk, _, cb) {
+		cb(new Error('test'));
+	}),
+	through()
+)
+eos(rs4.pipe(p1), function(err) {
+	expected--;
+	assert(err);
+	assert(err.message !== 'premature close', 'does not close with premature close');
+});
+
+// Fails
+var rs5 =	fs.createReadStream('/dev/random');
 var pumpifyErr = pumpify(
 	through(),
 	through(function(chunk, _, cb) {
@@ -91,7 +107,8 @@ var pumpifyErr = pumpify(
 	}),
 	fs.createWriteStream('/dev/null')
 )
-eos(rs4.pipe(pumpifyErr), function(err) {
+eos(rs5.pipe(pumpifyErr), function(err) {
+	expected--;
 	assert(err);
 	assert(err.message !== 'premature close', 'does not close with premature close');
 });
