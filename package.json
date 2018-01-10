@@ -32,7 +32,7 @@
   "author": "Mathias Buus <mathiasbuus@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "pumpify": "^1.3.5",
+    "pumpify": "^1.3.6",
     "through2": "^2.0.3"
   }
 }
