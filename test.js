@@ -13,7 +13,7 @@ eos(ws, function(err) {
 	assert(this === ws);
 	if (!expected) process.exit(0);
 });
-ws.close();
+ws.destroy();
 
 var rs1 = fs.createReadStream('/dev/random');
 eos(rs1, function(err) {
@@ -22,7 +22,7 @@ eos(rs1, function(err) {
 	assert(this === rs1);
 	if (!expected) process.exit(0);
 });
-rs1.close();
+rs1.destroy();
 
 var rs2 = fs.createReadStream(__filename);
 eos(rs2, function(err) {
