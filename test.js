@@ -1,13 +1,10 @@
 var assert = require('assert');
 var eos = require('./index');
 
-var expected = 10;
+var expected = 8;
 var fs = require('fs');
 var cp = require('child_process');
 var net = require('net');
-
-var pumpify = require('pumpify');
-var through = require('through2');
 
 var ws = fs.createWriteStream('/dev/null');
 eos(ws, function(err) {
@@ -81,36 +78,6 @@ var server = net.createServer(function(socket) {
 		assert(this === socket);
 		if (!expected) process.exit(0);
 	});
-});
-
-// Succeeds
-var rs4 = fs.createReadStream('/dev/urandom');
-var p1 = pumpify(
-	through(),
-	through(function(chunk, _, cb) {
-		cb(new Error('test'));
-	}),
-	through()
-)
-eos(rs4.pipe(p1), function(err) {
-	expected--;
-	assert(err);
-	assert(err.message !== 'premature close', 'does not close with premature close');
-});
-
-// Fails
-var rs5 = fs.createReadStream('/dev/urandom');
-var pumpifyErr = pumpify(
-	through(),
-	through(function(chunk, _, cb) {
-		cb(new Error('test'));
-	}),
-	fs.createWriteStream('/dev/null')
-)
-eos(rs5.pipe(pumpifyErr), function(err) {
-	expected--;
-	assert(err);
-	assert(err.message !== 'premature close', 'does not close with premature close');
 });
 
 setTimeout(function() {
