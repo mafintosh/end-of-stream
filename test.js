@@ -18,7 +18,7 @@ eos(ws, function(err) {
 });
 ws.destroy();
 
-var rs1 = fs.createReadStream('/dev/random');
+var rs1 = fs.createReadStream('/dev/urandom');
 eos(rs1, function(err) {
 	expected--;
 	assert(!!err);
@@ -84,7 +84,7 @@ var server = net.createServer(function(socket) {
 });
 
 // Succeeds
-var rs4 =	fs.createReadStream('/dev/random');
+var rs4 = fs.createReadStream('/dev/urandom');
 var p1 = pumpify(
 	through(),
 	through(function(chunk, _, cb) {
@@ -99,7 +99,7 @@ eos(rs4.pipe(p1), function(err) {
 });
 
 // Fails
-var rs5 =	fs.createReadStream('/dev/random');
+var rs5 = fs.createReadStream('/dev/urandom');
 var pumpifyErr = pumpify(
 	through(),
 	through(function(chunk, _, cb) {
