@@ -65,16 +65,18 @@ eos(socket, function(err) {
 });
 
 var server = net.createServer(function(socket) {
-	eos(socket, function() {
+	eos(socket, function(err) {
 		expected--;
+		assert(!!err);
 		assert(this === socket);
 		if (!expected) process.exit(0);
 	});
 	socket.destroy();
 }).listen(30000, function() {
 	var socket = net.connect(30000);
-	eos(socket, function() {
+	eos(socket, function(err) {
 		expected--;
+		assert.ifError(err);
 		assert(this === socket);
 		if (!expected) process.exit(0);
 	});
