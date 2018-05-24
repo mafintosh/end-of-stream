@@ -27,7 +27,7 @@ rs1.destroy();
 var rs2 = fs.createReadStream(__filename);
 eos(rs2, function(err) {
 	expected--;
-	assert(!err);
+	assert.ifError(err);
 	assert(this === rs2);
 	if (!expected) process.exit(0);
 });
@@ -35,6 +35,7 @@ rs2.pipe(fs.createWriteStream('/dev/null'));
 
 var rs3 = fs.createReadStream(__filename);
 eos(rs3, function(err) {
+	assert.ifError(err);
 	assert(this === rs);
 	throw new Error('no go');
 })();
@@ -43,7 +44,7 @@ rs3.pipe(fs.createWriteStream('/dev/null'));
 var exec = cp.exec('echo hello world');
 eos(exec, function(err) {
 	expected--;
-	assert(!err);
+	assert.ifError(err);
 	assert(this === exec);
 	if (!expected) process.exit(0);
 });
@@ -51,7 +52,7 @@ eos(exec, function(err) {
 var spawn = cp.spawn('echo', ['hello world']);
 eos(spawn, function(err) {
 	expected--;
-	assert(!err);
+	assert.ifError(err);
 	assert(this === spawn);
 	if (!expected) process.exit(0);
 });
