@@ -1,10 +1,11 @@
 var assert = require('assert');
 var eos = require('./index');
 
-var expected = 8;
+var expected = 10;
 var fs = require('fs');
 var cp = require('child_process');
 var net = require('net');
+var http = require('http');
 
 var ws = fs.createWriteStream('/dev/null');
 eos(ws, function(err) {
@@ -80,6 +81,24 @@ var server = net.createServer(function(socket) {
 		assert.ifError(err);
 		assert(this === socket);
 		if (!expected) process.exit(0);
+	});
+});
+
+var server2 = http.createServer(function(req, res) {
+	eos(res, function(err) {
+		expected--;
+		assert.ifError(err);
+	});
+	res.end();
+}).listen(function() {
+	var port = server2.address().port;
+	http.get('http://localhost:' + port, function(res) {
+		eos(res, function(err) {
+			expected--;
+			assert.ifError(err);
+			server2.close();
+		});
+		res.resume();
 	});
 });
 
