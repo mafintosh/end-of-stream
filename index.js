@@ -1,7 +1,3 @@
-var once = require('once');
-
-var noop = function() {};
-
 var isRequest = function(stream) {
 	return stream.setHeader && typeof stream.abort === 'function';
 };
@@ -10,11 +6,18 @@ var isChildProcess = function(stream) {
 	return stream.stdio && Array.isArray(stream.stdio) && stream.stdio.length === 3
 };
 
-var eos = function(stream, opts, callback) {
+var eos = function(stream, opts, cb) {
 	if (typeof opts === 'function') return eos(stream, null, opts);
 	if (!opts) opts = {};
 
-	callback = once(callback || noop);
+	var called = false;
+
+	function callback() {
+		if (called) return;
+		called = true;
+		cleanup();
+		if (typeof cb === 'function') cb.apply(stream, arguments);
+	}
 
 	var ws = stream._writableState;
 	var rs = stream._readableState;
@@ -27,16 +30,16 @@ var eos = function(stream, opts, callback) {
 
 	var onfinish = function() {
 		writable = false;
-		if (!readable) callback.call(stream);
+		if (!readable) callback();
 	};
 
 	var onend = function() {
 		readable = false;
-		if (!writable) callback.call(stream);
+		if (!writable) callback();
 	};
 
 	var onexit = function(exitCode) {
-		callback.call(stream, exitCode ? new Error('exited with error code: ' + exitCode) : null);
+		callback(exitCode ? new Error('exited with error code: ' + exitCode) : null);
 	};
 
 	var onerror = function(err) {
@@ -44,8 +47,8 @@ var eos = function(stream, opts, callback) {
 	};
 
 	var onclose = function() {
-		if (readable && !(rs && rs.ended)) return callback.call(stream, new Error('premature close'));
-		if (writable && !(ws && ws.ended)) return callback.call(stream, new Error('premature close'));
+		if (readable && !(rs && rs.ended)) return callback(new Error('premature close'));
+		if (writable && !(ws && ws.ended)) return callback(new Error('premature close'));
 	};
 
 	var onrequest = function() {
@@ -69,7 +72,7 @@ var eos = function(stream, opts, callback) {
 	if (opts.error !== false) stream.on('error', onerror);
 	stream.on('close', onclose);
 
-	return function() {
+	function cleanup() {
 		stream.removeListener('complete', onfinish);
 		stream.removeListener('abort', onclose);
 		stream.removeListener('request', onrequest);
@@ -81,7 +84,9 @@ var eos = function(stream, opts, callback) {
 		stream.removeListener('end', onend);
 		stream.removeListener('error', onerror);
 		stream.removeListener('close', onclose);
-	};
+	}
+
+	return cleanup;
 };
 
 module.exports = eos;
