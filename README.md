@@ -15,7 +15,7 @@ Both legacy streams, streams2 and stream3 are supported.
 var eos = require('end-of-stream');
 
 eos(readableStream, function(err) {
-  // this will be set to the stream instance
+  // `this` will be set to the stream instance
 	if (err) return console.log('stream had an error or closed early');
 	console.log('stream has ended', this === readableStream);
 });
