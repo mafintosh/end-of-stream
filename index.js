@@ -54,9 +54,19 @@ var eos = function(stream, opts, callback) {
 		if (writable && !(ws && (ws.ended && !ws.destroyed))) return callback.call(stream, new Error('premature close'));
 	};
 
+	var oneosnexttick = function() {
+		onclosenexttick()
+		callback.call(stream)
+	}
+
 	var onrequest = function() {
 		stream.req.on('finish', onfinish);
 	};
+
+	if ((readable && rs && (rs.ended || rs.destroyed)) || (writable && ws && (ws.ended || ws.destroyed))) {
+		process.nextTick(oneosnexttick);
+		return function() { };
+	}
 
 	if (isRequest(stream)) {
 		stream.on('complete', onfinish);
