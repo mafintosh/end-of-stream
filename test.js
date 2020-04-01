@@ -31,34 +31,36 @@ tape('fs readstream destroy', function (t) {
 	rs1.destroy()
 })
 
-tape('fs writestream already destroyed', function (t) {
-	var ws = fs.createWriteStream('/dev/null');
-
-	ws.destroy()
-
-	setTimeout(function() {
-		eos(ws, function(err) {
-			t.ok(!!err)
-			t.ok(this === ws)
-			t.end()
-		})
-	}, 200)
-
-})
-
-tape('fs readstream already destroyed', function (t) {
-	var rs1 = fs.createReadStream('/dev/urandom');
-
-	rs1.destroy()
-
-	setTimeout(function() {
-		eos(rs1, function(err) {
-			t.ok(!!err)
-			t.ok(this === rs1)
-			t.end()
-		})
-	}, 200)
-})
+if (parseInt(process.versions.node) >= 8) {
+	tape('fs writestream already destroyed', function (t) {
+		var ws = fs.createWriteStream('/dev/null');
+	
+		ws.destroy()
+	
+		setTimeout(function() {
+			eos(ws, function(err) {
+				t.ok(!!err)
+				t.ok(this === ws)
+				t.end()
+			})
+		}, 200)
+	
+	})
+	
+	tape('fs readstream already destroyed', function (t) {
+		var rs1 = fs.createReadStream('/dev/urandom');
+	
+		rs1.destroy()
+	
+		setTimeout(function() {
+			eos(rs1, function(err) {
+				t.ok(!!err)
+				t.ok(this === rs1)
+				t.end()
+			})
+		}, 200)
+	})
+}
 
 tape('fs readstream pipe', function (t) {
 	var rs2 = fs.createReadStream(__filename)
