@@ -1,3 +1,4 @@
+const process = require('process')
 var once = require('once');
 
 var noop = function() {};
