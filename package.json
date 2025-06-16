@@ -9,9 +9,6 @@
   "dependencies": {
     "once": "^1.4.0"
   },
-  "optionalDependencies": {
-    "bare-process": "^4.2.1"
-  },
   "scripts": {
     "test": "node test.js"
   },
@@ -36,11 +33,5 @@
   "license": "MIT",
   "devDependencies": {
     "tape": "^4.11.0"
-  },
-  "imports": {
-    "process": {
-      "bare": "bare-process",
-      "default": "process"
-    }
   }
 }

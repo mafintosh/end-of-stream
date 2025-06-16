@@ -1,4 +1,3 @@
-const process = require('process')
 var once = require('once');
 
 var noop = function() {};
@@ -45,8 +44,10 @@ var eos = function(stream, opts, callback) {
 		callback.call(stream, err);
 	};
 
+	var qnt = global.Bare ? queueMicrotask : process.nextTick.bind(process);
+
 	var onclose = function() {
-		process.nextTick(onclosenexttick);
+		qnt(onclosenexttick);
 	};
 
 	var onclosenexttick = function() {
