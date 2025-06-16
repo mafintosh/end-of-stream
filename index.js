@@ -2,6 +2,8 @@ var once = require('once');
 
 var noop = function() {};
 
+var qnt = global.Bare ? queueMicrotask : process.nextTick.bind(process);
+
 var isRequest = function(stream) {
 	return stream.setHeader && typeof stream.abort === 'function';
 };
@@ -43,8 +45,6 @@ var eos = function(stream, opts, callback) {
 	var onerror = function(err) {
 		callback.call(stream, err);
 	};
-
-	var qnt = global.Bare ? queueMicrotask : process.nextTick.bind(process);
 
 	var onclose = function() {
 		qnt(onclosenexttick);
