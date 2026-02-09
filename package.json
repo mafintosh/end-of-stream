@@ -6,9 +6,6 @@
     "type": "git",
     "url": "git://github.com/mafintosh/end-of-stream.git"
   },
-  "dependencies": {
-    "once": "^1.4.0"
-  },
   "scripts": {
     "test": "node test.js"
   },

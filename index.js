@@ -1,6 +1,13 @@
-var once = require('once');
-
 var noop = function() {};
+
+var once = function(fn) {
+	var called = false;
+	return function() {
+		if (called) return;
+		called = true;
+		return fn.apply(this, arguments);
+	};
+};
 
 var qnt = global.Bare ? queueMicrotask : process.nextTick.bind(process);
 
