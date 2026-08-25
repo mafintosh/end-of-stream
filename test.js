@@ -120,6 +120,44 @@ tape('http', function (t) {
 	})
 })
 
+tape('callback is only called once on duplex end', function (t) {
+	t.plan(2)
+	var s = new stream.PassThrough()
+
+	eos(s, function (err) {
+		t.ifError(err)
+		t.pass('callback fired')
+	})
+
+	s.resume()
+	s.end()
+})
+
+tape('callback is only called once on error then close', function (t) {
+	t.plan(2)
+	var s = new stream.PassThrough()
+
+	eos(s, function (err) {
+		t.ok(err, 'should receive error')
+		t.pass('callback fired')
+	})
+
+	s.destroy(new Error('boom'))
+})
+
+tape('callback is only called once on multiple errors', function (t) {
+	t.plan(2)
+	var s = new stream.PassThrough()
+
+	eos(s, function (err) {
+		t.ok(err, 'should receive error')
+		t.pass('callback fired')
+	})
+
+	s.emit('error', new Error('first'))
+	s.emit('error', new Error('second'))
+})
+
 tape('end() and emit(close)', function (t) {
   if (!stream.Writable) return t.end()
   var ws = new stream.Writable()
