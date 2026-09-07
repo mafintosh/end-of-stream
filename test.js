@@ -137,3 +137,42 @@ tape('end() and emit(close)', function (t) {
   ws.end()
   ws.emit('close')
 })
+
+tape('already ended readable stream still calls back', function (t) {
+  var rs = new stream.Readable({ read: function () {} })
+  rs.push(null)
+  rs.resume()
+
+  setImmediate(function () {
+    eos(rs, function (err) {
+      t.error(err, 'no error')
+      t.end()
+    })
+  })
+})
+
+tape('already finished writable stream still calls back', function (t) {
+  var ws = new stream.Writable({
+    write: function (data, enc, cb) { cb() }
+  })
+  ws.end()
+
+  setImmediate(function () {
+    eos(ws, function (err) {
+      t.error(err, 'no error')
+      t.end()
+    })
+  })
+})
+
+tape('already destroyed stream (never ended) still calls back with an error', function (t) {
+  var rs = new stream.Readable({ read: function () {} })
+  rs.destroy()
+
+  setImmediate(function () {
+    eos(rs, function (err) {
+      t.ok(err, 'has error')
+      t.end()
+    })
+  })
+})

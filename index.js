@@ -20,8 +20,13 @@ var eos = function(stream, opts, callback) {
 
 	var ws = stream._writableState;
 	var rs = stream._readableState;
-	var readable = opts.readable || (opts.readable !== false && stream.readable);
-	var writable = opts.writable || (opts.writable !== false && stream.writable);
+	// stream.readable/stream.writable flip to false once a stream has
+	// finished, so a stream that already ended/finished before eos() was
+	// called would otherwise be auto-detected as neither readable nor
+	// writable and never resolve. Fall back to the underlying state's own
+	// "already done" flag so already-finished streams are still detected.
+	var readable = opts.readable || (opts.readable !== false && (stream.readable || (rs && rs.endEmitted)));
+	var writable = opts.writable || (opts.writable !== false && (stream.writable || (ws && ws.finished)));
 	var cancelled = false;
 
 	var onlegacyfinish = function() {
@@ -76,6 +81,19 @@ var eos = function(stream, opts, callback) {
 	stream.on('finish', onfinish);
 	if (opts.error !== false) stream.on('error', onerror);
 	stream.on('close', onclose);
+
+	// If the stream already finished/ended/closed before we got a chance to
+	// attach the listeners above, none of those events will ever fire again,
+	// so the callback would otherwise hang forever. Check the current state
+	// on next tick and resolve it the same way the event handlers would.
+	qnt(function() {
+		if (cancelled) return;
+		if (readable && rs && rs.endEmitted) onend();
+		if (writable && ws && ws.finished) onfinish();
+		if (stream.destroyed && !(rs && rs.endEmitted) && !(ws && ws.finished)) {
+			callback.call(stream, new Error('premature close'));
+		}
+	});
 
 	return function() {
 		cancelled = true;
